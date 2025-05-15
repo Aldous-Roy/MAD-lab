@@ -1,0 +1,84 @@
+package example.com.calculater;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText opr1, opr2;
+    private TextView txtResult;
+    private Button btnAdd, btnSub, btnMul, btnDiv, btnClr;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize Views
+        opr1 = findViewById(R.id.editOp1);
+        opr2 = findViewById(R.id.editOp2);
+        txtResult = findViewById(R.id.result);
+
+        btnAdd = findViewById(R.id.btnadd);
+        btnSub = findViewById(R.id.btnsub);
+        btnMul = findViewById(R.id.btnmul);
+        btnDiv = findViewById(R.id.btndiv);
+        btnClr = findViewById(R.id.btnclr);
+
+        // Set Click Listeners
+        btnAdd.setOnClickListener(v -> calculate("+"));
+        btnSub.setOnClickListener(v -> calculate("-"));
+        btnMul.setOnClickListener(v -> calculate("*"));
+        btnDiv.setOnClickListener(v -> calculate("/"));
+
+        btnClr.setOnClickListener(v -> {
+            opr1.setText("");
+            opr2.setText("");
+            txtResult.setText("0.00");
+            opr1.requestFocus();
+        });
+    }
+
+    private void calculate(String operator) {
+        String op1 = opr1.getText().toString().trim();
+        String op2 = opr2.getText().toString().trim();
+
+        if (op1.isEmpty() || op2.isEmpty()) {
+            Toast.makeText(this, "Enter both numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double num1 = Double.parseDouble(op1);
+        double num2 = Double.parseDouble(op2);
+        double result = 0.0;
+
+        switch (operator) {
+            case "+":
+                result = num1 + num2;
+                break;
+            case "-":
+                result = num1 - num2;
+                break;
+            case "*":
+                result = num1 * num2;
+                break;
+            case "/":
+                if (num2 == 0) {
+                    Toast.makeText(this, "Cannot divide by zero", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                result = num1 / num2;
+                break;
+        }
+
+        txtResult.setText(String.format("%.2f", result));
+    }
+}
+
+
+
