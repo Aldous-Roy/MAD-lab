@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout>
+<TextView
+    android:id="@+id/textView"
+    android:text="Vaishu: hey wassup!!"
+    android:textSize="18sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+
+<EditText
+    android:id="@+id/editTextText"
+    android:hint="Reply..."
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+
+<Button
+    android:id="@+id/notify_button"
+    android:text="Notify Later"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="20dp" />
+</LinearLayout>
+
+
+
+
+
+package com.example.notify;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+
+public class MainActivity extends AppCompatActivity {
+private static final String CHANNEL_ID = "simple_channel";
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    createChannel();
+
+    Button notifyButton = findViewById(R.id.notify_button);
+    notifyButton.setOnClickListener(v -> sendNotification());
+}
+
+private void sendNotification() {
+    Intent intent = new Intent(this, MainActivity.class);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Reminder")
+            .setContentText("Don't forget to reply to Vaishu!")
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+    NotificationManager manager = getSystemService(NotificationManager.class);
+    manager.notify(1, builder.build());
+}
+
+private void createChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID, "Simple Channel", NotificationManager.IMPORTANCE_HIGH);
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(channel);
+    }
+}
+}
