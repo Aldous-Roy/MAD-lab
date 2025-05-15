@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent" android:layout_height="match_parent"
+android:padding="16dp">
+<EditText android:id="@+id/editTextEmail"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Email"
+android:inputType="textEmailAddress" />
+<EditText android:id="@+id/editTextPassword"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextEmail"
+android:layout_marginTop="16dp"
+android:hint="Password"
+android:inputType="textPassword" />
+<Button
+android:id="@+id/buttonLogin"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextPassword"
+android:layout_marginTop="16dp"
+android:text="Login" />
+<TextView
+android:id="@+id/textViewRegister"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/buttonLogin"
+android:layout_marginTop="16dp"
+android:text="Don't have an account? Register here." android:textAlignment="center" />
+</RelativeLayout>
+Actvity_register.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent" android:layout_height="match_parent"
+android:padding="16dp">
+<EditText
+android:id="@+id/editTextRegisterName"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Name" android:inputType="text"
+/>
+<EditText android:id="@+id/editTextRegisterCollegeId"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextRegisterName"
+android:layout_marginTop="16dp"
+android:hint="College ID"
+android:inputType="text" />
+<EditText
+android:id="@+id/editTextRegisterEmail"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextRegisterCollegeId"
+android:layout_marginTop="16dp" android:hint="Email"
+android:inputType="textEmailAddress" />
+<EditText android:id="@+id/editTextRegisterRegNumber"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextRegisterEmail"
+android:layout_marginTop="16dp"
+android:hint="Registration Number"
+android:inputType="text" />
+<EditText android:id="@+id/editTextRegisterPassword"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextRegisterRegNumber"
+android:layout_marginTop="16dp" android:hint="Password"
+android:inputType="textPassword" />
+<Button
+android:id="@+id/buttonRegister"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/editTextRegisterPassword"
+android:layout_marginTop="16dp" android:text="Register"
+</RelativeLayout>
+
+
+
+
+package com.example.placementreg;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class RegisterActivity extends AppCompatActivity {
+    EditText nameInput, collegeIdInput, emailInput, regNumberInput, passwordInput;
+    Button registerButton;
+    DatabaseHelper dbHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+
+        dbHelper = new DatabaseHelper(this);
+
+        nameInput = findViewById(R.id.editTextRegisterName);
+        collegeIdInput = findViewById(R.id.editTextRegisterCollegeId);
+        emailInput = findViewById(R.id.editTextRegisterEmail);
+        regNumberInput = findViewById(R.id.editTextRegisterRegNumber);
+        passwordInput = findViewById(R.id.editTextRegisterPassword);
+        registerButton = findViewById(R.id.buttonRegister);
+
+        registerButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            String collegeId = collegeIdInput.getText().toString().trim();
+            String email = emailInput.getText().toString().trim();
+            String regNumber = regNumberInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
+
+            long result = dbHelper.insertUser(name, collegeId, email, regNumber, password);
+            if (result != -1) {
+                Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, MainActivity.class));
+            } else {
+                Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+
+
+package com.example.placementreg;
+
+import android.content.*;
+import android.database.Cursor;
+import android.database.sqlite.*;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "auth.db";
+    private static final int DATABASE_VERSION = 1;
+
+    public static final String TABLE_USERS = "users";
+    public static final String COL_ID = "id";
+    public static final String COL_NAME = "name";
+    public static final String COL_COLLEGE_ID = "college_id";
+    public static final String COL_EMAIL = "email";
+    public static final String COL_REG_NO = "reg_number";
+    public static final String COL_PASSWORD = "password";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTable = "CREATE TABLE " + TABLE_USERS + "(" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_NAME + " TEXT, " +
+                COL_COLLEGE_ID + " TEXT, " +
+                COL_EMAIL + " TEXT, " +
+                COL_REG_NO + " TEXT, " +
+                COL_PASSWORD + " TEXT)";
+        db.execSQL(createTable);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        onCreate(db);
+    }
+
+    public long insertUser(String name, String collegeId, String email, String regNo, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, name);
+        values.put(COL_COLLEGE_ID, collegeId);
+        values.put(COL_EMAIL, email);
+        values.put(COL_REG_NO, regNo);
+        values.put(COL_PASSWORD, password);
+        return db.insert(TABLE_USERS, null, values);
+    }
+
+    public boolean authenticateUser(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                TABLE_USERS,
+                null,
+                COL_EMAIL + "=? AND " + COL_PASSWORD + "=?",
+                new String[]{email, password},
+                null, null, null
+        );
+        boolean isAuthenticated = cursor.getCount() > 0;
+        cursor.close();
+        return isAuthenticated;
+    }
+}
+
+
+
+
+package com.example.placementreg;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    EditText emailInput, passwordInput;
+    Button loginButton;
+    TextView registerLink;
+    DatabaseHelper dbHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        dbHelper = new DatabaseHelper(this);
+
+        emailInput = findViewById(R.id.editTextEmail);
+        passwordInput = findViewById(R.id.editTextPassword);
+        loginButton = findViewById(R.id.buttonLogin);
+        registerLink = findViewById(R.id.textViewRegister);
+
+        loginButton.setOnClickListener(v -> {
+            String email = emailInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
+
+            if (dbHelper.authenticateUser(email, password)) {
+                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, HomeActivity.class));
+            } else {
+                Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        registerLink.setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class))
+        );
+    }
+}
+
+
+
+
+
+
