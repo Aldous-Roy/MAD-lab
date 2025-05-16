@@ -1,0 +1,17 @@
+BASIC STEPS TO IMPLEMENT MAD LAB: 
+
+1.  Create a new Android project 
+
+Go to D drive -> MAD folder -> adt bundle -> eclipse -> click eclipse purple color ball icon -> select workspace - >  java adt -> file -> new -> android application -> application name -> next -> finish 
+
+2.Editing code 
+
+Goto app folder -> src -> java-> MainActivity.java 
+
+For XML codes : goto res folder -> layout -> activity_main.xml
+
+3.To run 
+
+Goto menu bar (in top) -> AVD -> device definition -> select any one of the phone (emulator) -> create AVD -> click ok 
+
+Now in the menubar -> click run as Android application option or use play button to run the app
